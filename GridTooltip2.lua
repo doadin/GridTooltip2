@@ -1,17 +1,16 @@
 local GridFrame = Grid:GetModule("GridFrame")
 
-GridTooltip = Grid:NewModule("GridTooltip")
+GridTooltip2 = Grid:NewModule("GridTooltip2")
 
-GridTooltip.defaultDB = {
+GridTooltip2.defaultDB = {
     enabledIndicators = {
         icon = true,
     },
 }
 
-
-GridTooltip.options = {
-	name = "GridTooltip",
-	desc = "Options for GridTooltip.",
+GridTooltip2.options = {
+	name = "GridTooltip2",
+	desc = "Options for GridTooltip2.",
 	order = 2,
 	type = "group",
 	childGroups = "tab",
@@ -21,7 +20,6 @@ GridTooltip.options = {
 }
 
 local lastMouseOverFrame
-
 
 local function FindTooltip(unit, texture, index)
     index = index or 1
@@ -43,13 +41,13 @@ local function FindTooltip(unit, texture, index)
     return nil
 end
 
-function GridTooltip.SetIndicator(frame, indicator, color, text, value, maxValue, texture, start, duration, stack)
+function GridTooltip2.SetIndicator(frame, indicator, color, text, value, maxValue, texture, start, duration, stack)
 	
-	if texture and GridTooltip.db.profile.enabledIndicators[indicator] then
+	if texture and GridTooltip2.db.profile.enabledIndicators[indicator] then
         if frame.unit and UnitExists(frame.unit)then
             frame.ToolTip = texture
             if lastMouseOverFrame then
-                GridTooltip.OnEnter(lastMouseOverFrame)
+                GridTooltip2.OnEnter(lastMouseOverFrame)
             end            
         end
 	end
@@ -57,20 +55,20 @@ end
 
 
 
-function GridTooltip.ClearIndicator(frame, indicator)   
-    if GridTooltip.db.profile.enabledIndicators[indicator] then
+function GridTooltip2.ClearIndicator(frame, indicator)   
+    if GridTooltip2.db.profile.enabledIndicators[indicator] then
         frame.ToolTip = nil
         frame.ToolTipIndex = nil
     end
 end
 
-function GridTooltip.CreateFrames(gridFrameObj, frame)
+function GridTooltip2.CreateFrames(gridFrameObj, frame)
     local f = frame
-    frame:HookScript("OnEnter", GridTooltip.OnEnter)
-	frame:HookScript("OnLeave", GridTooltip.OnLeave)
+    frame:HookScript("OnEnter", GridTooltip2.OnEnter)
+	frame:HookScript("OnLeave", GridTooltip2.OnLeave)
 end
 
-function GridTooltip.OnEnter(frame)
+function GridTooltip2.OnEnter(frame)
     local unitid = frame.unit
     if not unitid then return end   
     lastMouseOverFrame = frame
@@ -87,56 +85,61 @@ function GridTooltip.OnEnter(frame)
     end
 end
 
-function GridTooltip.OnLeave(iconFrame)
+function GridTooltip2.OnLeave(iconFrame)
     GameTooltip:Hide()
     if lastMouseOverFrame == iconFrame then
         lastMouseOverFrame = nil
     end
 end
 
-function GridTooltip:OnInitialize()
+function GridTooltip2:OnInitialize()
     if not self.db then
 		self.db = Grid.db:RegisterNamespace(self.moduleName, { profile = self.defaultDB or { } })
 	end
     
-    GridTooltip.knownIndicators = {}
+    GridTooltip2.knownIndicators = {}
     
     GridFrame:RegisterIndicator("tooltip", "Tooltip dummy. Do not use!",
         function(frame)
-            GridTooltip.CreateFrames(nil, frame)
+            GridTooltip2.CreateFrames(nil, frame)
             return {}
         end,
         
         function(self)
             local indicators = self.__owner.indicators
             for id, indicator in pairs(indicators) do
-                if not GridTooltip.knownIndicators[id] then 
-                    GridTooltip.options.args[id] = {
+                if not GridTooltip2.knownIndicators[id] then 
+                    GridTooltip2.options.args[id] = {
                         name = id,
                         desc = "Display tooltip for indicator: "..GridFrame.indicators[id].name,
                         order = 60, width = "double",
                         type = "toggle",
                         get = function()
-                            return GridTooltip.db.profile.enabledIndicators[id]
+                            return GridTooltip2.db.profile.enabledIndicators[id]
                         end,
                         set = function(_, v)
-                            GridTooltip.db.profile.enabledIndicators[id] = v
+                            GridTooltip2.db.profile.enabledIndicators[id] = v
                         end,
                     }
-                    GridTooltip.knownIndicators[id] = true
+                    GridTooltip2.knownIndicators[id] = true
                 end
             end
+        end,
+        
+        function()
+        end,
+        function()
         end
     )
-    hooksecurefunc(GridFrame.prototype, "SetIndicator", GridTooltip.SetIndicator)
-    hooksecurefunc(GridFrame.prototype, "ClearIndicator", GridTooltip.ClearIndicator)
+    hooksecurefunc(GridFrame.prototype, "SetIndicator", GridTooltip2.SetIndicator)
+    hooksecurefunc(GridFrame.prototype, "ClearIndicator", GridTooltip2.ClearIndicator)
 end
 
-function GridTooltip:OnEnable()
+function GridTooltip2:OnEnable()
 end
 
-function GridTooltip:OnDisable()
+function GridTooltip2:OnDisable()
 end
 
-function GridTooltip:Reset(frame)
+function GridTooltip2:Reset(frame)
 end
