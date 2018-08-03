@@ -1,0 +1,14 @@
+## Interface: 60000
+## Title: GridTooltip
+## Notes: Adds tooltip for debuffs (and other things? you found out: no).
+## Author: Julith@EU-Perenolde
+## Version: 0.8
+## Grid Author: Pastamancer & Maia
+## Dependencies: Grid
+## X-Curse-Packaged-Version: v0.71
+## X-Curse-Project-Name: GridTooltip
+## X-Curse-Project-ID: gridtooltip
+## X-Curse-Repository-ID: wow/gridtooltip/mainline
+
+GridTooltip.lua
+
