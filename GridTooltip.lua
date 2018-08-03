@@ -27,17 +27,17 @@ local function FindTooltip(unit, texture, index)
     index = index or 1
     local i = 0
     --search from the last index the texture was found to the left and right for the texture
-    local name, rank, icon, count, buffType, duration, expirationTime, source, isStealable, _, id = UnitDebuff(unit, index)
+    local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId = UnitDebuff(unit, index)
     while name or index - i > 1 do 
         if icon == texture then
-            return index + i, id
+            return index + i, spellId
         end
         i = i + 1
-        name, rank, icon, count, buffType, duration, expirationTime, source, isStealable, _, id  = UnitDebuff(unit, index - i)
+        name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId = UnitDebuff(unit, index - i)
         if icon == texture then
-            return index - i, id
+            return index - i, spellId
         end
-        name, rank, icon, count, buffType, duration, expirationTime, source, isStealable, _, id  = UnitDebuff(unit, index + i)
+        name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId = UnitDebuff(unit, index + i)
     end
     
     return nil
@@ -68,7 +68,6 @@ function GridTooltip.CreateFrames(gridFrameObj, frame)
     local f = frame
     frame:HookScript("OnEnter", GridTooltip.OnEnter)
 	frame:HookScript("OnLeave", GridTooltip.OnLeave)
-    --frame.IconBG.frame = frame --oh god!
 end
 
 function GridTooltip.OnEnter(frame)
@@ -103,12 +102,12 @@ function GridTooltip:OnInitialize()
     GridTooltip.knownIndicators = {}
     
     GridFrame:RegisterIndicator("tooltip", "Tooltip dummy. Do not use!",
-        function(frame) -- new method
+        function(frame)
             GridTooltip.CreateFrames(nil, frame)
             return {}
         end,
         
-        function(self) --reset method
+        function(self)
             local indicators = self.__owner.indicators
             for id, indicator in pairs(indicators) do
                 if not GridTooltip.knownIndicators[id] then 
@@ -127,12 +126,8 @@ function GridTooltip:OnInitialize()
                     GridTooltip.knownIndicators[id] = true
                 end
             end
-        end,
-        function() end, function() end) --set and clear methods
-    
-    
-    
-    --hook the hell out of GridFrame :-)
+        end
+    )
     hooksecurefunc(GridFrame.prototype, "SetIndicator", GridTooltip.SetIndicator)
     hooksecurefunc(GridFrame.prototype, "ClearIndicator", GridTooltip.ClearIndicator)
 end
