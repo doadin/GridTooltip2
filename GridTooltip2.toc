@@ -1,8 +1,8 @@
-## Interface: 80000
+## Interface: 80100
 ## Title: GridTooltip2
 ## Notes: Adds tooltip for debuffs.
 ## Author: tptbk(Doadin-Malorne-US)
-## Version: 8.0.1.1
+## Version: 8.1.0.0
 ## Grid Author: Pastamancer & Maia
 ## Dependencies: Grid
 ## X-Curse-Project-Name: GridTooltip2
