@@ -1,4 +1,3 @@
 package-as: GridTooltip2
-#manual-changelog: CHANGELOG.txt
 ignore:
  - .pkgmeta
