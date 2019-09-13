@@ -1,13 +1,18 @@
+#@retail@
 ## Interface: 80200
+#@end-retail@
+#@non-retail@
+# ## Interface: 11302
+#@end-non-retail@
+## Version: @project-version@
 ## Title: GridTooltip2
 ## Notes: Adds tooltip for debuffs.
 ## Author: tptbk(Doadin-Malorne-US)
-## Version: 8.2.0.0
 ## Grid Author: Pastamancer & Maia
-## Dependencies: Grid
+## OptionalDeps: Grid, Plexus
 ## X-Curse-Project-Name: GridTooltip2
-## X-Curse-Project-ID: gridtooltip2
 ## X-Curse-credits-former-author: Julith@EU-Perenolde
+## X-Curse-Project-ID: 299850
 
 GridTooltip2.lua
 
