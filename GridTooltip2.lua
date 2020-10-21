@@ -1,6 +1,15 @@
-local GridFrame = Grid:GetModule("GridFrame")
-
-GridTooltip2 = Grid:NewModule("GridTooltip2")
+local UnitBuff = UnitBuff --luacheck: ignore 113
+local UnitDebuff = UnitDebuff --luacheck: ignore 113
+local GridFrame
+local GridTooltip2
+if (IsAddOnLoaded("Plexus")) then --luacheck: ignore 113
+    GridFrame = Plexus:GetModule("PlexusFrame") --luacheck: ignore 113
+    GridTooltip2 = Plexus:NewModule("GridTooltip2") --luacheck: ignore 113
+end
+if (IsAddOnLoaded("Grid")) then --luacheck: ignore 113
+    GridFrame = Grid:GetModule("GridFrame") --luacheck: ignore 113
+    GridTooltip2 = Grid:NewModule("GridTooltip2") --luacheck: ignore 113
+end
 
 GridTooltip2.defaultDB = {
     enabledIndicators = {
@@ -14,37 +23,55 @@ GridTooltip2.options = {
     order = 2,
     type = "group",
     childGroups = "tab",
-    disabled = InCombatLockdown,
+    disabled = InCombatLockdown, --luacheck: ignore 113
     args = {
     }
 }
 
 local lastMouseOverFrame
 
-local function FindTooltip(unit, texture, index)
-    index = index or 1
+local function FindTooltipDebuff(unit, texture, index)
+    local index = index or 1 --luacheck: ignore 412
     local i = 0
     --search from the last index the texture was found to the left and right for the texture
-    local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId = UnitDebuff(unit, index)
+    local name, icon, _, _, _, _, _, _, _, spellId = UnitDebuff(unit, index) --luacheck: ignore 631
     while name or index - i > 1 do
         if icon == texture then
             return index + i, spellId
         end
         i = i + 1
-        name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId = UnitDebuff(unit, index - i)
+        _, icon, _, _, _, _, _, _, _, spellId = UnitDebuff(unit, index - i) --luacheck: ignore 631
         if icon == texture then
             return index - i, spellId
         end
-        name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, _, spellId = UnitDebuff(unit, index + i)
+        name, icon, _, _, _, _, _, _, _, spellId = UnitDebuff(unit, index + i) --luacheck: ignore 631
     end
 
     return nil
 end
 
-function GridTooltip2.SetIndicator(frame, indicator, color, text, value, maxValue, texture, start, duration, stack)
+local function FindTooltipBuff(unit, texture, index)
+    local index = index or 1 --luacheck: ignore 412
+    local i = 0
+    local name, icon, _, _, _, _, _, _, _, spellId = UnitBuff(unit, index) --luacheck: ignore 631
+    while name or index - i > 1 do
+        if icon == texture then
+            return index + i, spellId
+        end
+        i = i + 1
+        _, icon, _, _, _, _, _, _, _, spellId = UnitBuff(unit, index - i) --luacheck: ignore 631
+        if icon == texture then
+            return index - i, spellId
+        end
+        name, icon, _, _, _, _, _, _, _, spellId = UnitBuff(unit, index + i) --luacheck: ignore 631
+    end
 
+    return nil
+end
+
+function GridTooltip2.SetIndicator(frame, indicator, _, _, _, _, texture, _, _, _)
     if texture and GridTooltip2.db.profile.enabledIndicators[indicator] then
-        if frame.unit and UnitExists(frame.unit)then
+        if frame.unit and UnitExists(frame.unit)then --luacheck: ignore 113
             frame.ToolTip = texture
             if lastMouseOverFrame then
                 GridTooltip2.OnEnter(lastMouseOverFrame)
@@ -62,7 +89,7 @@ function GridTooltip2.ClearIndicator(frame, indicator)
     end
 end
 
-function GridTooltip2.CreateFrames(gridFrameObj, frame)
+function GridTooltip2.CreateFrames(_, frame)
     frame:HookScript("OnEnter", GridTooltip2.OnEnter)
     frame:HookScript("OnLeave", GridTooltip2.OnLeave)
 end
@@ -74,18 +101,33 @@ function GridTooltip2.OnEnter(frame)
 
     if not frame.ToolTip then return end
 
-    local id
-    frame.ToolTipIndex, id = FindTooltip(unitid, frame.ToolTip, frame.ToolTipIndex)
+    local debuff
+    local buff
+    if FindTooltipDebuff(unitid, frame.ToolTip, frame.ToolTipIndex) then
+        frame.ToolTipIndex = FindTooltipDebuff(unitid, frame.ToolTip, frame.ToolTipIndex)
+        debuff = true
+    end
+    if FindTooltipBuff(unitid, frame.ToolTip, frame.ToolTipIndex) then
+        frame.ToolTipIndex = FindTooltipBuff(unitid, frame.ToolTip, frame.ToolTipIndex)
+        buff = true
+    end
 
-    if frame.ToolTipIndex then
-        GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
-        GameTooltip:SetUnitDebuff(unitid, frame.ToolTipIndex)
-        GameTooltip:Show()
+
+    if debuff then
+        GameTooltip_SetDefaultAnchor(GameTooltip, UIParent) --luacheck: ignore 113
+        GameTooltip:SetUnitDebuff(unitid, frame.ToolTipIndex) --luacheck: ignore 113
+        GameTooltip:Show() --luacheck: ignore 113
+    end
+
+    if buff then
+        GameTooltip_SetDefaultAnchor(GameTooltip, UIParent) --luacheck: ignore 113
+        GameTooltip:SetUnitBuff(unitid, frame.ToolTipIndex) --luacheck: ignore 113
+        GameTooltip:Show() --luacheck: ignore 113
     end
 end
 
 function GridTooltip2.OnLeave(iconFrame)
-    GameTooltip:Hide()
+    GameTooltip:Hide() --luacheck: ignore 113
     if lastMouseOverFrame == iconFrame then
         lastMouseOverFrame = nil
     end
@@ -93,7 +135,7 @@ end
 
 function GridTooltip2:OnInitialize()
     if not self.db then
-        self.db = Grid.db:RegisterNamespace(self.moduleName, { profile = self.defaultDB or { } })
+        self.db = Grid.db:RegisterNamespace(self.moduleName, { profile = self.defaultDB or { } }) --luacheck: ignore 113
     end
 
     GridTooltip2.knownIndicators = {}
@@ -104,9 +146,9 @@ function GridTooltip2:OnInitialize()
             return {}
         end,
 
-        function(self)
+        function(self) --luacheck: ignore 432
             local indicators = self.__owner.indicators
-            for id, indicator in pairs(indicators) do
+            for id, _ in pairs(indicators) do
                 if not GridTooltip2.knownIndicators[id] then
                     GridTooltip2.options.args[id] = {
                         name = id,
@@ -130,15 +172,15 @@ function GridTooltip2:OnInitialize()
         function()
         end
     )
-    hooksecurefunc(GridFrame.prototype, "SetIndicator", GridTooltip2.SetIndicator)
-    hooksecurefunc(GridFrame.prototype, "ClearIndicator", GridTooltip2.ClearIndicator)
+    hooksecurefunc(GridFrame.prototype, "SetIndicator", GridTooltip2.SetIndicator) --luacheck: ignore 113
+    hooksecurefunc(GridFrame.prototype, "ClearIndicator", GridTooltip2.ClearIndicator) --luacheck: ignore 113
 end
 
-function GridTooltip2:OnEnable()
+function GridTooltip2:OnEnable() --luacheck: ignore 212
 end
 
-function GridTooltip2:OnDisable()
+function GridTooltip2:OnDisable() --luacheck: ignore 212
 end
 
-function GridTooltip2:Reset(frame)
+function GridTooltip2:Reset(frame) --luacheck: ignore 212
 end
