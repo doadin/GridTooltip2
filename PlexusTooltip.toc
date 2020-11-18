@@ -5,14 +5,12 @@
 ## Interface: 11305
 #@end-non-retail@
 ## Version: @project-version@
-## Title: GridTooltip2
+## Title: PlexusTooltip
 ## Notes: Adds tooltip for debuffs.
-## Author: tptbk(Doadin-Malorne-US)
+## Author: Doadin
 ## Grid Author: Pastamancer & Maia
 ## OptionalDeps: Grid, Plexus
-## X-Curse-Project-Name: GridTooltip2
 ## X-Curse-credits-former-author: Julith@EU-Perenolde
 ## X-Curse-Project-ID: 299850
 
-GridTooltip2.lua
-
+PlexusTooltip.lua
