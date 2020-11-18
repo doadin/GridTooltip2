@@ -1,25 +1,25 @@
 local UnitBuff = UnitBuff --luacheck: ignore 113
 local UnitDebuff = UnitDebuff --luacheck: ignore 113
 local GridFrame
-local GridTooltip2
+local PlexusTooltip
 if (IsAddOnLoaded("Plexus")) then --luacheck: ignore 113
     GridFrame = Plexus:GetModule("PlexusFrame") --luacheck: ignore 113
-    GridTooltip2 = Plexus:NewModule("GridTooltip2") --luacheck: ignore 113
+    PlexusTooltip = Plexus:NewModule("PlexusTooltip") --luacheck: ignore 113
 end
 if (IsAddOnLoaded("Grid")) then --luacheck: ignore 113
     GridFrame = Grid:GetModule("GridFrame") --luacheck: ignore 113
-    GridTooltip2 = Grid:NewModule("GridTooltip2") --luacheck: ignore 113
+    PlexusTooltip = Grid:NewModule("PlexusTooltip") --luacheck: ignore 113
 end
 
-GridTooltip2.defaultDB = {
+PlexusTooltip.defaultDB = {
     enabledIndicators = {
         icon = true,
     },
 }
 
-GridTooltip2.options = {
-    name = "GridTooltip2",
-    desc = "Options for GridTooltip2.",
+PlexusTooltip.options = {
+    name = "Tooltip",
+    desc = "Options for PlexusTooltip.",
     order = 2,
     type = "group",
     childGroups = "tab",
@@ -69,12 +69,12 @@ local function FindTooltipBuff(unit, texture, index)
     return nil
 end
 
-function GridTooltip2.SetIndicator(frame, indicator, _, _, _, _, texture, _, _, _)
-    if texture and GridTooltip2.db.profile.enabledIndicators[indicator] then
+function PlexusTooltip.SetIndicator(frame, indicator, _, _, _, _, texture, _, _, _)
+    if texture and PlexusTooltip.db.profile.enabledIndicators[indicator] then
         if frame.unit and UnitExists(frame.unit)then --luacheck: ignore 113
             frame.ToolTip = texture
             if lastMouseOverFrame then
-                GridTooltip2.OnEnter(lastMouseOverFrame)
+                PlexusTooltip.OnEnter(lastMouseOverFrame)
             end
         end
     end
@@ -82,19 +82,19 @@ end
 
 
 
-function GridTooltip2.ClearIndicator(frame, indicator)
-    if GridTooltip2.db.profile.enabledIndicators[indicator] then
+function PlexusTooltip.ClearIndicator(frame, indicator)
+    if PlexusTooltip.db.profile.enabledIndicators[indicator] then
         frame.ToolTip = nil
         frame.ToolTipIndex = nil
     end
 end
 
-function GridTooltip2.CreateFrames(_, frame)
-    frame:HookScript("OnEnter", GridTooltip2.OnEnter)
-    frame:HookScript("OnLeave", GridTooltip2.OnLeave)
+function PlexusTooltip.CreateFrames(_, frame)
+    frame:HookScript("OnEnter", PlexusTooltip.OnEnter)
+    frame:HookScript("OnLeave", PlexusTooltip.OnLeave)
 end
 
-function GridTooltip2.OnEnter(frame)
+function PlexusTooltip.OnEnter(frame)
     local unitid = frame.unit
     if not unitid then return end
     lastMouseOverFrame = frame
@@ -126,43 +126,43 @@ function GridTooltip2.OnEnter(frame)
     end
 end
 
-function GridTooltip2.OnLeave(iconFrame)
+function PlexusTooltip.OnLeave(iconFrame)
     GameTooltip:Hide() --luacheck: ignore 113
     if lastMouseOverFrame == iconFrame then
         lastMouseOverFrame = nil
     end
 end
 
-function GridTooltip2:OnInitialize()
+function PlexusTooltip:OnInitialize()
     if not self.db then
         self.db = Grid.db:RegisterNamespace(self.moduleName, { profile = self.defaultDB or { } }) --luacheck: ignore 113
     end
 
-    GridTooltip2.knownIndicators = {}
+    PlexusTooltip.knownIndicators = {}
 
     GridFrame:RegisterIndicator("tooltip", "Tooltip dummy. Do not use!",
         function(frame)
-            GridTooltip2.CreateFrames(nil, frame)
+            PlexusTooltip.CreateFrames(nil, frame)
             return {}
         end,
 
         function(self) --luacheck: ignore 432
             local indicators = self.__owner.indicators
             for id, _ in pairs(indicators) do
-                if not GridTooltip2.knownIndicators[id] then
-                    GridTooltip2.options.args[id] = {
+                if not PlexusTooltip.knownIndicators[id] then
+                    PlexusTooltip.options.args[id] = {
                         name = id,
                         desc = "Display tooltip for indicator: "..GridFrame.indicators[id].name,
                         order = 60, width = "double",
                         type = "toggle",
                         get = function()
-                            return GridTooltip2.db.profile.enabledIndicators[id]
+                            return PlexusTooltip.db.profile.enabledIndicators[id]
                         end,
                         set = function(_, v)
-                            GridTooltip2.db.profile.enabledIndicators[id] = v
+                            PlexusTooltip.db.profile.enabledIndicators[id] = v
                         end,
                     }
-                    GridTooltip2.knownIndicators[id] = true
+                    PlexusTooltip.knownIndicators[id] = true
                 end
             end
         end,
@@ -172,15 +172,15 @@ function GridTooltip2:OnInitialize()
         function()
         end
     )
-    hooksecurefunc(GridFrame.prototype, "SetIndicator", GridTooltip2.SetIndicator) --luacheck: ignore 113
-    hooksecurefunc(GridFrame.prototype, "ClearIndicator", GridTooltip2.ClearIndicator) --luacheck: ignore 113
+    hooksecurefunc(GridFrame.prototype, "SetIndicator", PlexusTooltip.SetIndicator) --luacheck: ignore 113
+    hooksecurefunc(GridFrame.prototype, "ClearIndicator", PlexusTooltip.ClearIndicator) --luacheck: ignore 113
 end
 
-function GridTooltip2:OnEnable() --luacheck: ignore 212
+function PlexusTooltip:OnEnable() --luacheck: ignore 212
 end
 
-function GridTooltip2:OnDisable() --luacheck: ignore 212
+function PlexusTooltip:OnDisable() --luacheck: ignore 212
 end
 
-function GridTooltip2:Reset(frame) --luacheck: ignore 212
+function PlexusTooltip:Reset(frame) --luacheck: ignore 212
 end
