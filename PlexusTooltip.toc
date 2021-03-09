@@ -9,7 +9,7 @@
 ## Notes: Adds tooltip for debuffs.
 ## Author: Doadin
 ## Grid Author: Pastamancer & Maia
-## OptionalDeps: Grid, Plexus
+## Dependencies: Plexus
 ## X-Curse-credits-former-author: Julith@EU-Perenolde
 ## X-Curse-Project-ID: 299850
 
